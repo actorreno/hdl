@@ -2,6 +2,8 @@
 source ../../../scripts/adi_env.tcl
 source ../../scripts/adi_project_intel.tcl
 
+set project_name [get_env_param ADI_PROJECT_NAME adrv9009_s10soc]
+
 adi_project adrv9009_s10soc
 
 source $ad_hdl_dir/projects/common/s10soc/s10soc_system_assign.tcl

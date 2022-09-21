@@ -49,59 +49,59 @@ proc adi_project {project_name {mode 0} {parameter_list {}} } {
   set board ""
 
   # Determine the device based on the board name
-  if [regexp "_ac701$" $project_name] {
+  if [regexp "_ac701" $project_name] {
     set device "xc7a200tfbg676-2"
     set board [lindex [lsearch -all -inline [get_board_parts] *ac701*] end]
   }
-  if [regexp "_kc705$" $project_name] {
+  if [regexp "_kc705" $project_name] {
     set device "xc7k325tffg900-2"
     set board [lindex [lsearch -all -inline [get_board_parts] *kc705*] end]
   }
-  if [regexp "_vc707$" $project_name] {
+  if [regexp "_vc707" $project_name] {
     set device "xc7vx485tffg1761-2"
     set board [lindex [lsearch -all -inline [get_board_parts] *vc707*] end]
   }
-  if [regexp "_vcu118$" $project_name] {
+  if [regexp "_vcu118" $project_name] {
     set device "xcvu9p-flga2104-2L-e"
     set board [lindex [lsearch -all -inline [get_board_parts] *vcu118*] end]
   }
-  if [regexp "_vcu128$" $project_name] {
+  if [regexp "_vcu128" $project_name] {
     set device "xcvu37p-fsvh2892-2L-e"
     set board [lindex [lsearch -all -inline [get_board_parts] *vcu128:part0*] end]
   }
-  if [regexp "_kcu105$" $project_name] {
+  if [regexp "_kcu105" $project_name] {
     set device "xcku040-ffva1156-2-e"
     set board [lindex [lsearch -all -inline [get_board_parts] *kcu105*] end]
   }
-  if [regexp "_zed$" $project_name] {
+  if [regexp "_zed" $project_name] {
     set device "xc7z020clg484-1"
     set board [lindex [lsearch -all -inline [get_board_parts] *zed*] end]
   }
-  if [regexp "_coraz7s$" $project_name] {
+  if [regexp "_coraz7s" $project_name] {
     set device "xc7z007sclg400-1"
     set board "not-applicable"
   }
-  if [regexp "_microzed$" $project_name] {
+  if [regexp "_microzed" $project_name] {
     set device "xc7z010clg400-1"
     set board "not-applicable"
   }
-  if [regexp "_zc702$" $project_name] {
+  if [regexp "_zc702" $project_name] {
     set device "xc7z020clg484-1"
     set board [lindex [lsearch -all -inline [get_board_parts] *zc702*] end]
   }
-  if [regexp "_zc706$" $project_name] {
+  if [regexp "_zc706" $project_name] {
     set device "xc7z045ffg900-2"
     set board [lindex [lsearch -all -inline [get_board_parts] *zc706*] end]
   }
-  if [regexp "_mitx045$" $project_name] {
+  if [regexp "_mitx045" $project_name] {
     set device "xc7z045ffg900-2"
     set board "not-applicable"
   }
-  if [regexp "_zcu102$" $project_name] {
+  if [regexp "_zcu102" $project_name] {
     set device "xczu9eg-ffvb1156-2-e"
     set board [lindex [lsearch -all -inline [get_board_parts] *zcu102*] end]
   }
-  if [regexp "_vmk180_es1$" $project_name] {
+  if [regexp "_vmk180_es1" $project_name] {
     enable_beta_device xcvm*
     xhub::refresh_catalog [xhub::get_xstores xilinx_board_store]
     xhub::install [xhub::get_xitems xilinx.com:xilinx_board_store:vmk180_es:*] -quiet
@@ -109,15 +109,15 @@ proc adi_project {project_name {mode 0} {parameter_list {}} } {
     set device "xcvm1802-vsva2197-2MP-e-S-es1"
     set board [lindex [lsearch -all -inline [get_board_parts] *vmk180_es*] end]
   }
-  if [regexp "_vmk180$" $project_name] {
+  if [regexp "_vmk180" $project_name] {
     set device "xcvm1802-vsva2197-2MP-e-S"
     set board [lindex [lsearch -all -inline [get_board_parts] *vmk180*] end]
   }
-  if [regexp "_vck190$" $project_name] {
+  if [regexp "_vck190" $project_name] {
     set device "xcvc1902-vsva2197-2MP-e-S"
     set board [lindex [lsearch -all -inline [get_board_parts] *vck190*] end]
   }
-  if [regexp "_vc709$" $project_name] {
+  if [regexp "_vc709" $project_name] {
     set device "xc7vx690tffg1761-2"
     set board [lindex [lsearch -all -inline [get_board_parts] *vc709*] end]
   }
@@ -308,7 +308,7 @@ proc adi_project_run {project_name} {
   }
   wait_on_run synth_1
   open_run synth_1
-  report_timing_summary -file timing_synth.log
+  report_timing_summary -file ${project_name}_timing_synth.log
 
   if {![info exists ::env(ADI_NO_BITSTREAM_COMPRESSION)] && ![info exists ADI_NO_BITSTREAM_COMPRESSION]} {
     set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
@@ -324,10 +324,10 @@ proc adi_project_run {project_name} {
   launch_runs impl_1 -to_step write_bitstream
   wait_on_run impl_1
   open_run impl_1
-  report_timing_summary -warn_on_violation -file timing_impl.log
+  report_timing_summary -warn_on_violation -file ${project_name}_timing_impl.log
 
   if {[info exists ::env(ADI_GENERATE_UTILIZATION)]} {
-    set csv_file resource_utilization.csv
+    set csv_file ${project_name}_resource_utilization.csv
     if {[ catch {
       xilinx::designutils::report_failfast -csv -file $csv_file -transpose -no_header -ignore_pr -quiet
       set MMCM [llength [get_cells -hierarchical -filter { PRIMITIVE_TYPE =~ *MMCM* }]]
@@ -380,7 +380,7 @@ proc adi_project_run {project_name} {
   }
 
   if {[info exists ::env(ADI_GENERATE_XPA)]} {
-    set csv_file power_analysis.csv
+    set csv_file ${project_name}_power_analysis.csv
     set Layers "8to11"
     set CapLoad "20"
     set ToggleRate "15.00000"
@@ -429,7 +429,7 @@ proc adi_project_run {project_name} {
     if {[info exist num_regs]} {
       if {$num_regs > 0} {
         puts "CRITICAL WARNING: There are $num_regs registers with no clocks !!! See no_clock.log for details."
-        check_timing -override_defaults no_clock -verbose -file no_clock.log
+        check_timing -override_defaults no_clock -verbose -file ${project_name}_no_clock.log
       }
     }
 

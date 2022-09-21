@@ -9,6 +9,27 @@ HDL_LIBRARY_PATH := $(HDL_PROJECT_PATH)../library/
 
 include $(HDL_PROJECT_PATH)../quiet.mk
 
+# Parse the config file and convert it to environment variables
+ifdef CFG
+    include $(CFG)
+    export $(shell sed 's/=.*//' $(CFG))
+    PROJECT_NAME := $(PROJECT_NAME)_$(basename $(notdir $(CFG)))
+    EXPORT_ADI_PROJECT_NAME := 1
+endif
+
+# Parse the variables passed to make and convert them to the filename format
+CMD_VARIABLES := $(shell echo $(-*-command-variables-*-) | sed -e 's/CFG=[^ \n]*//g' | tac -s ' ')
+ifneq ($(strip $(CMD_VARIABLES)), )
+    PARAMS := $(shell echo $(CMD_VARIABLES) | sed -e 's/[ =]/_/g')
+    PROJECT_NAME := $(PROJECT_NAME)_$(PARAMS)
+    EXPORT_ADI_PROJECT_NAME := 1
+endif
+
+ifdef EXPORT_ADI_PROJECT_NAME
+    ADI_PROJECT_NAME := $(PROJECT_NAME)
+    export ADI_PROJECT_NAME
+endif
+
 VIVADO := vivado -mode batch -source
 
 CLEAN_TARGET := *.cache
@@ -16,7 +37,7 @@ CLEAN_TARGET += *.data
 CLEAN_TARGET += *.xpr
 CLEAN_TARGET += *.log
 CLEAN_TARGET += *.jou
-CLEAN_TARGET +=  xgui
+CLEAN_TARGET += xgui
 CLEAN_TARGET += *.runs
 CLEAN_TARGET += *.srcs
 CLEAN_TARGET += *.sdk
@@ -44,6 +65,7 @@ M_DEPS += $(HDL_PROJECT_PATH)scripts/adi_board.tcl
 M_DEPS += $(foreach dep,$(LIB_DEPS),$(HDL_LIBRARY_PATH)$(dep)/component.xml)
 
 .PHONY: all lib clean clean-all
+
 all: lib $(PROJECT_NAME).sdk/system_top.xsa
 
 clean:

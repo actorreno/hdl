@@ -21,7 +21,9 @@ source $ad_hdl_dir/projects/scripts/adi_board.tcl
 
 set CMOS_LVDS_N [get_env_param CMOS_LVDS_N 1]
 
-adi_project adrv9001_zcu102 0 [list \
+set project_name [get_env_param ADI_PROJECT_NAME adrv9001_zcu102]
+
+adi_project $project_name 0 [list \
   CMOS_LVDS_N $CMOS_LVDS_N \
 ]
 
@@ -41,5 +43,5 @@ if {$CMOS_LVDS_N == 0} {
   ]
 }
 
-adi_project_run adrv9001_zcu102
+adi_project_run $project_name
 

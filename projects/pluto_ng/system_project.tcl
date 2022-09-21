@@ -15,11 +15,13 @@ if [info exists ::env(ADI_PLUTO_FPGA)] {
 
 set sys_zynq 2
 
-adi_project pluto_ng
+set project_name [get_env_param ADI_PROJECT_NAME pluto_ng]
 
-adi_project_files pluto_ng [list \
+adi_project $project_name
+
+adi_project_files $project_name [list \
   "system_top.v" \
   "system_constr.xdc" \
   "$ad_hdl_dir/library/common/ad_iobuf.v" ]
 
-adi_project_run pluto_ng
+adi_project_run $project_name

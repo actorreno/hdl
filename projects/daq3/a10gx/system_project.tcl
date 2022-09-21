@@ -2,6 +2,8 @@
 source ../../../scripts/adi_env.tcl
 source ../../scripts/adi_project_intel.tcl
 
+set project_name [get_env_param ADI_PROJECT_NAME daq3_a10gx]
+
 adi_project daq3_a10gx
 
 source $ad_hdl_dir/projects/common/a10gx/a10gx_system_assign.tcl

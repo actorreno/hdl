@@ -15,6 +15,27 @@ endif
 
 export NIOS_MMU_ENABLED := $(NIOS2_MMU)
 
+# Parse the config file and convert it to environment variables
+ifdef CFG
+    include $(CFG)
+    export $(shell sed 's/=.*//' $(CFG))
+    PROJECT_NAME := $(PROJECT_NAME)_$(basename $(notdir $(CFG)))
+    EXPORT_ADI_PROJECT_NAME := 1
+endif
+
+# Parse the variables passed to make and convert them to the filename format
+CMD_VARIABLES := $(shell echo $(-*-command-variables-*-) | sed -e 's/CFG=[^ \n]*//g' | tac -s ' ')
+ifneq ($(strip $(CMD_VARIABLES)), )
+    PARAMS := $(shell echo $(CMD_VARIABLES) | sed -e 's/[ =]/_/g')
+    PROJECT_NAME := $(PROJECT_NAME)_$(PARAMS)
+    EXPORT_ADI_PROJECT_NAME := 1
+endif
+
+ifdef EXPORT_ADI_PROJECT_NAME
+    ADI_PROJECT_NAME := $(PROJECT_NAME)
+    export ADI_PROJECT_NAME
+endif
+
 INTEL := quartus_sh --64bit -t
 
 CLEAN_TARGET += *.log
@@ -76,7 +97,6 @@ M_DEPS += $(foreach dep,$(LIB_DEPS),$(HDL_LIBRARY_PATH)$(dep)/.timestamp_intel)
 
 .PHONY: all lib clean clean-all
 all: lib $(PROJECT_NAME).sof
-
 
 clean:
 	$(call clean, \
